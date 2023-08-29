@@ -4,12 +4,16 @@
   "description": "API desenvolvida para certificação do curso Explorer da Rocketseat",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node .src/server.js",
+    "dev": "nodemon ./src/server.js"
   },
   "keywords": [],
   "author": "Vivian Sanchez",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }
