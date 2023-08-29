@@ -1,0 +1,12 @@
+{
+  "name": "backend-food-explorer",
+  "version": "1.0.0",
+  "description": "API desenvolvida para certificação do curso Explorer da Rocketseat",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Vivian Sanchez",
+  "license": "ISC"
+}
