@@ -1,8 +1,16 @@
 const AppError = require("../utils/AppError")
+const sqlConnection = require("../database/sqlite")
 
 class UsersController {
-  create(req, res) {
+  async create(req, res) {
     const { name, email, password } = req.body
+    const database = await sqlConnection()
+
+    const checkUserExists = await database.get("SELECT * FROM users WHERE email =(?)", [email])
+
+    if(checkUserExists) {
+      throw new AppError("Este e-mail já está em uso!")
+    }
 
     if(!name){
       throw new AppError("Nome é obrigatório!")
@@ -20,7 +28,12 @@ class UsersController {
       throw new AppError("É necessário que a senha contenha pelo menos 6 caracteres!")
     }
 
-    res.status(201).json({ name, email, password })
+    await database.run(
+      "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+      [name, email, password]
+    )
+
+    return res.status(201).json()
   }
 }
 
