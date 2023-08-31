@@ -1,5 +1,6 @@
 const AppError = require("../utils/AppError")
 const sqlConnection = require("../database/sqlite")
+const { hash } = require("bcryptjs")
 
 class UsersController {
   async create(req, res) {
@@ -28,9 +29,11 @@ class UsersController {
       throw new AppError("É necessário que a senha contenha pelo menos 6 caracteres!")
     }
 
+    const hashedPassword = await hash(password, 8)
+
     await database.run(
       "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-      [name, email, password]
+      [name, email, hashedPassword]
     )
 
     return res.status(201).json()
