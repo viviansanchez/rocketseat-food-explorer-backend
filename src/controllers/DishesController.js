@@ -28,7 +28,32 @@ class DishesController {
 
   // async update(req, res){} atualizar um prato
 
-  // async index(req, res) {} mostrar vários pratos
+  async index(req, res) {
+    const { title, ingredient } = req.query
+
+    let dishes
+
+    if(title) {
+      dishes = await knex("dishes").whereLike("title", `%${title}%`).orderBy("title")
+    } else if(ingredient){
+      dishes = await knex("ingredients")
+      .select([
+        "dishes.id",
+        "dishes.image",
+        "dishes.title",
+        "dishes.category",
+        "dishes.price",
+        "dishes.description"
+      ])
+        .whereLike("name", `%${ingredient}%`)
+        .innerJoin("dishes", "dishes.id", "ingredients.dish_id")
+        
+    } else {
+      dishes = await knex("dishes")
+    }
+
+    return res.json(dishes)
+  }
 
   async show(req, res) {
     const { id } = req.params
