@@ -47,9 +47,10 @@ class DishesController {
       ])
         .whereLike("name", `%${ingredient}%`)
         .innerJoin("dishes", "dishes.id", "ingredients.dish_id")
+        .orderBy("dishes.title")
         
     } else {
-      dishes = await knex("dishes")
+      dishes = await knex("dishes").orderBy("title")
     }
 
     return res.json(dishes)
