@@ -30,6 +30,8 @@ class DishesController {
 
   async index(req, res) {
     const { title, ingredient } = req.query
+   
+    // como que eu vou diferenciar o que é ingrediente e o que é title?? não existe isso não tem sentido. deve ser uma constante só, que vai ser unificada na real. vai ser tipo 'search'. e ai tem que procurar das duas formas (as que tao no if e no if else) em uma coisa só. Problema bem obvio que na hora que fiz não pensei, preciso resolver asap.  
 
     let dishes
 
