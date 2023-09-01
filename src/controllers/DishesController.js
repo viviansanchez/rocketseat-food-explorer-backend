@@ -26,11 +26,21 @@ class DishesController {
     return res.status(201).json()
   }
 
+  async show(req, res) {
+    const { id } = req.params
+    
+    const dish = await knex("dishes").where({ id }).first()
+    const ingredients = await knex("ingredients").where({ dish_id: id }).orderBy("name")
+
+    return res.json({
+      ...dish, 
+      ingredients
+    })
+  }
+
   // async update(req, res){} atualizar um prato
 
   // async index(req, res) {} mostrar vários pratos
-
-  // async show(req, res) {} mostrar um prato
 
   // async this.delete(req, res) {} deletar um prato
 
