@@ -26,6 +26,10 @@ class DishesController {
     return res.status(201).json()
   }
 
+  // async update(req, res){} atualizar um prato
+
+  // async index(req, res) {} mostrar vários pratos
+
   async show(req, res) {
     const { id } = req.params
     
@@ -38,12 +42,13 @@ class DishesController {
     })
   }
 
-  // async update(req, res){} atualizar um prato
+  async delete(req, res) {
+    const { id } = req.params
 
-  // async index(req, res) {} mostrar vários pratos
+    await knex("dishes").where({ id }).delete()
 
-  // async this.delete(req, res) {} deletar um prato
-
+    return res.json()
+  }
 }
 
 module.exports = DishesController
