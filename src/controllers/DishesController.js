@@ -1,5 +1,7 @@
 const knex = require("../database/knex")
 
+//on create, delete and update methods there will need to be a check if the user isAdmin in order to proceed i think
+
 class DishesController {
   async create(req, res) {
     const { title, category, price, description, ingredients } = req.body
@@ -29,28 +31,28 @@ class DishesController {
   // async update(req, res){} atualizar um prato
 
   async index(req, res) {
-    const { title, ingredient } = req.query
-   
-    // como que eu vou diferenciar o que é ingrediente e o que é title?? não existe isso não tem sentido. deve ser uma constante só, que vai ser unificada na real. vai ser tipo 'search'. e ai tem que procurar das duas formas (as que tao no if e no if else) em uma coisa só. Problema bem obvio que na hora que fiz não pensei, preciso resolver asap.  
+    const { search } = req.query 
 
     let dishes
 
-    if(title) {
-      dishes = await knex("dishes").whereLike("title", `%${title}%`).orderBy("title")
-    } else if(ingredient){
-      dishes = await knex("ingredients")
+    if(search){
+      const filterSearch = search.split(',').map(tag => tag.trim())
+
+      dishes = await knex("dishes")
       .select([
         "dishes.id",
-        "dishes.image",
-        "dishes.title",
-        "dishes.category",
-        "dishes.price",
-        "dishes.description"
+          "dishes.image",
+          "dishes.title",
+          "dishes.category",
+          "dishes.price",
+          "dishes.description"
       ])
-        .whereLike("name", `%${ingredient}%`)
-        .innerJoin("dishes", "dishes.id", "ingredients.dish_id")
-        .orderBy("dishes.title")
-        
+      .leftJoin("ingredients", "dishes.id", "ingredients.dish_id")
+      .where(function() {
+        this.where("dishes.title", "like", `%${filterSearch}%`).orWhere("ingredients.name", "like", `%${filterSearch}%`)
+      })
+      .groupBy("dishes.id")
+      .orderBy("dishes.title")   
     } else {
       dishes = await knex("dishes").orderBy("title")
     }
