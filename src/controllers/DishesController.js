@@ -1,4 +1,5 @@
 const knex = require("../database/knex")
+const AppError = require("../utils/AppError")
 
 //on create, delete and update methods there will need to be a check if the user isAdmin in order to proceed i think
 
@@ -28,7 +29,63 @@ class DishesController {
     return res.status(201).json()
   }
 
-  // async update(req, res){} atualizar um prato
+  async update(req, res) {
+    let { title, category, price, description, ingredients } = req.body
+    const { id } = req.params
+    const { user_id } = req.query
+
+    const dish = await knex("dishes").where({ id }).first()
+    if(!dish) {
+      throw new AppError("Prato não encontrado!")
+    }
+
+    if(title){
+      const checkFoodTitle = await knex("dishes").where("title", title).first()
+      if(checkFoodTitle && checkFoodTitle.id !== id){
+      throw new AppError("Um prato com este nome já está cadastrado!")
+      }
+    }
+    
+
+    if(!title){
+      title = dish.title
+    }
+
+    if(!category) {
+      category = dish.category
+    }
+
+    if(!price){
+      price = dish.price
+    }
+
+    if(!description){
+      description = dish.description
+    }
+    
+    await knex("dishes").where("id", id).update({
+      title,
+      category,
+      price,
+      description
+    }).update("updated_at", knex.fn.now())
+
+    if(ingredients){
+      await knex("ingredients").where("dish_id", id).delete()
+
+      const ingredientsInsert = ingredients.map(ingredient => {
+        return {
+          name: ingredient,
+          dish_id: id,
+          user_id
+        }
+      })
+
+      await knex("ingredients").insert(ingredientsInsert)
+    }
+
+    return res.json()
+  }
 
   async index(req, res) {
     const { search } = req.query 
