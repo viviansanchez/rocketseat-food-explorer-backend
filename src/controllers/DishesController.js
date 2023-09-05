@@ -1,12 +1,17 @@
 const knex = require("../database/knex")
 const AppError = require("../utils/AppError")
 
-//on create, delete and update methods there will need to be a check if the user isAdmin in order to proceed i think
+//on create, delete and update methods there will need to be a check if the user isAdmin in order to proceed i think --> just an extra check, but technically it wouldnt be needed? not sure, leaving updated comment to think about it later.
 
 class DishesController {
   async create(req, res) {
     const { title, category, price, description, ingredients } = req.body
     const { user_id } = req.params
+
+    const checkUserCredentials = await knex("users").where({ id: user_id }).first()
+    if(!checkUserCredentials.isAdmin){
+      throw new AppError("Você não possui permissão para acessar esta página")
+    }
 
     const [dish_id] = await knex("dishes").insert({
       title,
@@ -33,6 +38,12 @@ class DishesController {
     let { title, category, price, description, ingredients } = req.body
     const { id } = req.params
     const { user_id } = req.query
+    //user_id is coming from query just for now, later will be different
+
+    const checkUserCredentials = await knex("users").where({ id: user_id }).first()
+    if(!checkUserCredentials.isAdmin){
+      throw new AppError("Você não possui permissão para acessar esta página")
+    }
 
     const dish = await knex("dishes").where({ id }).first()
     if(!dish) {
@@ -131,6 +142,14 @@ class DishesController {
 
   async delete(req, res) {
     const { id } = req.params
+    const { user_id } = req.query
+     //user_id is coming from query just for now, later will be different
+
+    const checkUserCredentials = await knex("users").where({ id: user_id }).first()
+    if(!checkUserCredentials.isAdmin){
+      throw new AppError("Você não possui permissão para realizar esta ação")
+    }
+
 
     await knex("dishes").where({ id }).delete()
 
