@@ -6,7 +6,7 @@ const AppError = require("../utils/AppError")
 class DishesController {
   async create(req, res) {
     const { title, category, price, description, ingredients } = req.body
-    const { user_id } = req.params
+    const  user_id  = req.user.id
 
     const checkUserCredentials = await knex("users").where({ id: user_id }).first()
     if(!checkUserCredentials.isAdmin){
@@ -37,10 +37,10 @@ class DishesController {
   async update(req, res) {
     let { title, category, price, description, ingredients } = req.body
     const { id } = req.params
-    const { user_id } = req.query
-    //user_id is coming from query just for now, later will be different
+    const  user_id  = req.user.id
 
     const checkUserCredentials = await knex("users").where({ id: user_id }).first()
+
     if(!checkUserCredentials.isAdmin){
       throw new AppError("Você não possui permissão para acessar esta página")
     }
@@ -57,7 +57,6 @@ class DishesController {
       }
     }
     
-
     if(!title){
       title = dish.title
     }
@@ -142,14 +141,13 @@ class DishesController {
 
   async delete(req, res) {
     const { id } = req.params
-    const { user_id } = req.query
-     //user_id is coming from query just for now, later will be different
+    const  user_id  = req.user.id
 
     const checkUserCredentials = await knex("users").where({ id: user_id }).first()
+
     if(!checkUserCredentials.isAdmin){
       throw new AppError("Você não possui permissão para realizar esta ação")
     }
-
 
     await knex("dishes").where({ id }).delete()
 
