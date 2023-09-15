@@ -1,19 +1,26 @@
 const knex = require("../database/knex")
 const AppError = require("../utils/AppError")
+const DiskStorage = require("../providers/DiskStorage")
 
 //on create, delete and update methods there will need to be a check if the user isAdmin in order to proceed i think --> just an extra check, but technically it wouldnt be needed? not sure, leaving updated comment to think about it later.
 
 class DishesController {
   async create(req, res) {
     const { title, category, price, description, ingredients } = req.body
+    const imageFileName = req.file.filename
     const  user_id  = req.user.id
+
+    const diskStorage = new DiskStorage()
 
     const checkUserCredentials = await knex("users").where({ id: user_id }).first()
     if(!checkUserCredentials.isAdmin){
       throw new AppError("Você não possui permissão para acessar esta página")
     }
 
+    const filename = await diskStorage.saveFile(imageFileName)
+
     const [dish_id] = await knex("dishes").insert({
+      image: filename,
       title,
       category,
       price,
@@ -38,7 +45,7 @@ class DishesController {
     let { title, category, price, description, ingredients } = req.body
     const { id } = req.params
     const  user_id  = req.user.id
-
+    //aqui fazer o update da imagem tambem
     const checkUserCredentials = await knex("users").where({ id: user_id }).first()
 
     if(!checkUserCredentials.isAdmin){
@@ -142,7 +149,7 @@ class DishesController {
   async delete(req, res) {
     const { id } = req.params
     const  user_id  = req.user.id
-
+    //aqui no delete precisa usar o diskstorage.delete 
     const checkUserCredentials = await knex("users").where({ id: user_id }).first()
 
     if(!checkUserCredentials.isAdmin){
