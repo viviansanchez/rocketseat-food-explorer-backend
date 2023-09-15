@@ -45,9 +45,11 @@ class DishesController {
     let { title, category, price, description, ingredients } = req.body
     const { id } = req.params
     const  user_id  = req.user.id
-    //aqui fazer o update da imagem tambem
-    const checkUserCredentials = await knex("users").where({ id: user_id }).first()
+    const imageFileName = req.file.filename
 
+    const diskStorage = new DiskStorage() 
+
+    const checkUserCredentials = await knex("users").where({ id: user_id }).first()
     if(!checkUserCredentials.isAdmin){
       throw new AppError("Você não possui permissão para acessar esta página")
     }
@@ -55,6 +57,18 @@ class DishesController {
     const dish = await knex("dishes").where({ id }).first()
     if(!dish) {
       throw new AppError("Prato não encontrado!")
+    }
+
+    let filename
+
+    if(!imageFileName){
+      filename = dish.image
+    }
+
+    if(imageFileName){
+      // I am not including a check to see if there is an image in the db because there will be, the admin will not be able to create a dish without an image (at least for now), so there will always be one
+      await diskStorage.deleteFile(dish.image) 
+      filename = await diskStorage.saveFile(imageFileName)
     }
 
     if(title){
@@ -81,6 +95,7 @@ class DishesController {
     }
     
     await knex("dishes").where("id", id).update({
+      image: filename,
       title,
       category,
       price,
