@@ -164,12 +164,17 @@ class DishesController {
   async delete(req, res) {
     const { id } = req.params
     const  user_id  = req.user.id
-    //aqui no delete precisa usar o diskstorage.delete 
+    const diskStorage = new DiskStorage()
+
     const checkUserCredentials = await knex("users").where({ id: user_id }).first()
 
     if(!checkUserCredentials.isAdmin){
       throw new AppError("Você não possui permissão para realizar esta ação")
     }
+    
+    const dish = await knex("dishes").where({ id }).first()
+    
+    await diskStorage.deleteFile(dish.image)
 
     await knex("dishes").where({ id }).delete()
 
