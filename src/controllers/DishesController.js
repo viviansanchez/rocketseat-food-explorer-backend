@@ -18,7 +18,6 @@ class DishesController {
     }
 
     const filename = await diskStorage.saveFile(imageFileName)
-
     const [dish_id] = await knex("dishes").insert({
       image: filename,
       title,
@@ -28,7 +27,9 @@ class DishesController {
       user_id
     })
 
-    const ingredientsInsert = ingredients.map(ingredient => {
+    const ingredientsArray = ingredients.split(",")
+
+    const ingredientsInsert = ingredientsArray.map(ingredient => {
       return {
         name: ingredient,
         dish_id,
@@ -123,8 +124,8 @@ class DishesController {
     const { search } = req.query 
 
     let dishes
-
-    if(search){
+ 
+    if(search && search !== "" ){
       const filterSearch = search.split(',').map(tag => tag.trim())
 
       dishes = await knex("dishes")
