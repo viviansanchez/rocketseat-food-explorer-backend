@@ -118,8 +118,14 @@ class DishesController {
 
   async index(req, res) {
     const { search } = req.query 
-
     let dishes
+
+    // if(search.length === 0){
+    //   dishes = await knex("dishes").orderBy("title")
+    // }
+    //failed attempt to resolve home page issue
+    //when finalizing everything I noticed that when the user first enters the home page dishes dont appear. If i hit spacebar on search input then they appear and everything functions normally. It's just the first load. 
+    //the && search !== "" below is also an attempt to fix that.
 
     if(search && search !== ""){
       const filterSearch = search.split(',').map(tag => tag.trim())
