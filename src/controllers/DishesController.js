@@ -2,8 +2,6 @@ const knex = require("../database/knex")
 const AppError = require("../utils/AppError")
 const DiskStorage = require("../providers/DiskStorage")
 
-//on create, delete and update methods there will need to be a check if the user isAdmin in order to proceed i think --> just an extra check, but technically it wouldnt be needed? not sure, leaving updated comment to think about it later.
-
 class DishesController {
   async create(req, res) {
     const { title, category, price, description, ingredients } = req.body
@@ -64,19 +62,15 @@ class DishesController {
 
     if(!imageFileName){
       filename = dish.image
+      //ok i know now that this doesnt work. i gues when testing i forgot to test this part, otherwise i would have realised it sooner (I found out while connecting this to the frontend).  
+      //My current workaround is forcing the user to upload the same or a new image --> which is not the best user experience but at least it works. 
+      //Leaving this comment here and the code as is bc the best way is to actually separate the image update in a different controller, and I want to be reminded of that.
     }
 
     if(imageFileName){
       // I am not including a check to see if there is an image in the db because there will be, the admin will not be able to create a dish without an image (at least for now), so there will always be one
       await diskStorage.deleteFile(dish.image) 
       filename = await diskStorage.saveFile(imageFileName)
-    }
-
-    if(title){
-      const checkFoodTitle = await knex("dishes").where("title", title).first()
-      if(checkFoodTitle && checkFoodTitle.id !== id){
-      throw new AppError("Um prato com este nome já está cadastrado!")
-      }
     }
     
     if(!title){
@@ -106,7 +100,9 @@ class DishesController {
     if(ingredients){
       await knex("ingredients").where("dish_id", id).delete()
 
-      const ingredientsInsert = ingredients.map(ingredient => {
+      const ingredientsArray = ingredients.split(",")
+
+      const ingredientsInsert = ingredientsArray.map(ingredient => {
         return {
           name: ingredient,
           dish_id: id,
@@ -124,8 +120,8 @@ class DishesController {
     const { search } = req.query 
 
     let dishes
- 
-    if(search && search !== "" ){
+
+    if(search && search !== ""){
       const filterSearch = search.split(',').map(tag => tag.trim())
 
       dishes = await knex("dishes")
