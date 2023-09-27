@@ -25,7 +25,7 @@ This is why the db was uploded with some information:
     - password: 123456
 
 The frontend of the application is hosted on Netlify. To access it, simply
-[click here.](boisterous-conkies-95afc5.netlify.app/)
+[click here.](https://boisterous-conkies-95afc5.netlify.app/)
 
 To consume this api on a project of your own, you can use the following link:
 https://foodexplorer-api-explorer.onrender.com
