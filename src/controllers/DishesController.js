@@ -126,6 +126,7 @@ class DishesController {
     //failed attempt to resolve home page issue
     //when finalizing everything I noticed that when the user first enters the home page dishes dont appear. If i hit spacebar on search input then they appear and everything functions normally. It's just the first load. 
     //the && search !== "" below is also an attempt to fix that.
+    //okay so it looks like I was able to fix this issue now on the frontend (by tying the useEffect to search and dishes). Leaving this comment here and the above unchanged for studying purposes in the future. 
 
     if(search && search !== ""){
       const filterSearch = search.split(',').map(tag => tag.trim())
